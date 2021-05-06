@@ -1,49 +1,86 @@
 package com.jmik.restapi;
 
-import com.jmik.storage.User;
 import com.jmik.service.UserService;
+import com.jmik.storage.User;
+import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.PathVariable;
-import io.micronaut.http.annotation.Post;
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.*;
+import io.micronaut.http.context.ServerRequestContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.jmik.restapi.utils.ThrowErrorFixture.notFound;
 
 /**
+ * REST API controller for user CRUD operations.
  * @author jmik
  */
 @Controller("/api")
 public class UserController {
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 	@Inject
 	UserService userService;
 
-	@Get("/user/{id}")
-	public HttpResponse<UserDto> getUserById(@PathVariable long id) throws IllegalAccessException {
-		//		UserDto usr = new UserDto("abc", "abc", "abc");
-		//		usr.setId(5L);
-		//		usr.setActive(true);
-		//		usr.setTags(Collections.singletonList("abc, def"));
-		//
-		//		return HttpResponse.ok(usr);
+	@Get("/users")
+	public HttpResponse<UserListDto> getUsers() {
+		List<User> users = userService.getAllUsers();
+		List<UserDto> usersDto = users.stream().map(this::mapEntityToDto).collect(Collectors.toList());
+		UserListDto dto = new UserListDto();
+		dto.setData(usersDto);
+		dto.setCount(usersDto.size());
+		return HttpResponse.ok(dto);
+	}
 
+	@Get("/users/{id}")
+	public UserDto getUserById(@PathVariable long id) {
 		Optional<User> user = userService.getById(id);
-		if (user.isPresent()) {
-			return HttpResponse.ok(mapEntityToDto(user.get()));
+		if (user.isEmpty()) {
+			throw notFound(String.format("User %d not found", id));
 		}
-		return HttpResponse.notFound();
+		return mapEntityToDto(user.get());
 	}
 
 	@Post("/users")
-	public UserDto create(UserDto user) {
+	public HttpResponse<UserDto> create(@Valid UserDto user) {
 		User created = userService.save(mapDtoToEntity(user));
-		return mapEntityToDto(created);
+		return HttpResponse.created(mapEntityToDto(created));
+	}
+
+	@Delete("/users/{id}")
+	public HttpStatus delete(@PathVariable long id) {
+		Optional<User> user = userService.getById(id);
+		if (user.isEmpty()) {
+			throw notFound(String.format("User %d not found", id));
+		}
+		userService.deleteById(id);
+		return HttpStatus.OK;
+	}
+
+	@Put("/users/{id}")
+	public HttpResponse<UserDto> alterUser(@Valid UserDto user, @PathVariable long id) {
+		Optional<User> existingUser = userService.getById(id);
+		if (existingUser.isEmpty()) {
+			throw notFound(String.format("User %d not found", id));
+		}
+		User response = userService.modifyUser(mapDtoToEntity(user));
+		return HttpResponse.ok(mapEntityToDto(response));
 	}
 
 	private User mapDtoToEntity(UserDto request) {
 		User usr = new User();
+		if (request.getId() != null) {
+			usr.setId(request.getId());
+		}
 		usr.setName(request.getName());
 		usr.setEmail(request.getEmail());
 		usr.setGroup(request.getGroup());
@@ -60,6 +97,22 @@ public class UserController {
 		user.setGroup(entity.getGroup());
 		user.setActive(entity.getActive());
 		user.setTags(Collections.singletonList(entity.getTags()));
+		user.setHref(getHref());
 		return user;
+	}
+
+	private String getHref() {
+		HttpRequest req = ServerRequestContext.currentRequest().get();
+		String href = "";
+		try {
+			href = new URL("http", req.getServerAddress().getHostName(), req.getServerAddress().getPort(), req.getPath()).toString();
+		} catch (MalformedURLException ex) {
+			LOGGER.error("Can't create href", ex);
+		}
+		return href;
+	}
+
+	class UserListDto extends ListDto<UserDto> {
+
 	}
 }

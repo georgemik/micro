@@ -7,6 +7,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
+ * DTO for user entity.
  * @author jmik
  */
 @Introspected
@@ -21,6 +22,7 @@ public class UserDto {
 	private String group;
 	private Boolean active = true;
 	private List<String> tags;
+	private String href;
 
 	public UserDto() {
 	}
@@ -77,5 +79,13 @@ public class UserDto {
 
 	public void setTags(List<String> tags) {
 		this.tags = tags;
+	}
+
+	public String getHref() {
+		return href;
+	}
+
+	public void setHref(String href) {
+		this.href = href;
 	}
 }
