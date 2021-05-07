@@ -33,7 +33,7 @@ public class UserService {
 		return userRepositry.listAll();
 	}
 
-	public User modifyUser(User user) {
+	public User updateUser(User user) {
 		return userRepositry.update(user);
 	}
 }

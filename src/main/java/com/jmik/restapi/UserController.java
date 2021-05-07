@@ -1,19 +1,16 @@
 package com.jmik.restapi;
 
+import com.jmik.restapi.utils.ApiUtils;
 import com.jmik.service.UserService;
 import com.jmik.storage.User;
-import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
-import io.micronaut.http.context.ServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +27,8 @@ public class UserController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 	@Inject
 	UserService userService;
+	@Inject
+	ApiUtils apiUtils;
 
 	@Get("/users")
 	public HttpResponse<UserListDto> getUsers() {
@@ -58,8 +57,8 @@ public class UserController {
 
 	@Delete("/users/{id}")
 	public HttpStatus delete(@PathVariable long id) {
-		Optional<User> user = userService.getById(id);
-		if (user.isEmpty()) {
+		Optional<User> existingUser = userService.getById(id);
+		if (existingUser.isEmpty()) {
 			throw notFound(String.format("User %d not found", id));
 		}
 		userService.deleteById(id);
@@ -67,12 +66,12 @@ public class UserController {
 	}
 
 	@Put("/users/{id}")
-	public HttpResponse<UserDto> alterUser(@Valid UserDto user, @PathVariable long id) {
+	public HttpResponse<UserDto> updateUser(@Valid UserDto user, @PathVariable long id) {
 		Optional<User> existingUser = userService.getById(id);
 		if (existingUser.isEmpty()) {
 			throw notFound(String.format("User %d not found", id));
 		}
-		User response = userService.modifyUser(mapDtoToEntity(user));
+		User response = userService.updateUser(mapDtoToEntity(user));
 		return HttpResponse.ok(mapEntityToDto(response));
 	}
 
@@ -96,23 +95,12 @@ public class UserController {
 		user.setEmail(entity.getEmail());
 		user.setGroup(entity.getGroup());
 		user.setActive(entity.getActive());
+//		needs improvement
 		user.setTags(Collections.singletonList(entity.getTags()));
-		user.setHref(getHref());
+		user.setHref(apiUtils.getHref());
 		return user;
 	}
 
-	private String getHref() {
-		HttpRequest req = ServerRequestContext.currentRequest().get();
-		String href = "";
-		try {
-			href = new URL("http", req.getServerAddress().getHostName(), req.getServerAddress().getPort(), req.getPath()).toString();
-		} catch (MalformedURLException ex) {
-			LOGGER.error("Can't create href", ex);
-		}
-		return href;
-	}
-
-	class UserListDto extends ListDto<UserDto> {
-
+	static class UserListDto extends ListDto<UserDto> {
 	}
 }
