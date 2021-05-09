@@ -1,5 +1,6 @@
 package com.jmik.restapi;
 
+import com.jmik.restapi.exceptionhandlers.ApiExceptionHandler;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;

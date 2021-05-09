@@ -1,5 +1,7 @@
 package com.jmik.restapi;
 
+import java.util.List;
+
 /**
  * Error holding DTO.
  * @author jmik
@@ -7,8 +9,9 @@ package com.jmik.restapi;
 public class ErrorRecordDto {
 	private final String message;
 	private final String code;
+	private List<Error> errors;
 
-	ErrorRecordDto(String message, String code) {
+	public ErrorRecordDto(String message, String code) {
 		this.message = message;
 		this.code = code;
 	}
@@ -19,5 +22,13 @@ public class ErrorRecordDto {
 
 	public String getCode() {
 		return code;
+	}
+
+	public List<Error> getErrors() {
+		return errors;
+	}
+
+	public void setErrors(List<Error> errors) {
+		this.errors = errors;
 	}
 }

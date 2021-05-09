@@ -1,8 +1,14 @@
 package com.jmik.storage;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * @author jmik
@@ -16,18 +22,23 @@ public class User {
 	private Long id;
 	@NotNull
 	@Column(name = "NAME", nullable = false, unique = true)
-	@Size(max = 50)
+	@Size(max = 255)
 	private String name;
 	@Column(name = "EMAIL")
-	@Size(max = 50)
+	@Size(max = 255)
 	private String email;
 	@Column(name = "USER_GROUP")
-	@Size(max = 50)
+	@Size(max = 255)
 	private String group;
 	@Column(name = "ACTIVE")
 	private Boolean active = true;
-	@Column(name = "TAGS")
-	private String tags;
+	@ElementCollection()
+	@CollectionTable(name = "TAGS", joinColumns = @JoinColumn(name = "USER_ID"))
+	@Column(name = "TAG")
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "USER_ID")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private List<String> tags;
 
 	public Long getId() {
 		return id;
@@ -69,11 +80,11 @@ public class User {
 		this.active = active;
 	}
 
-	public String getTags() {
+	public List<String> getTags() {
 		return tags;
 	}
 
-	public void setTags(String tags) {
+	public void setTags(List<String> tags) {
 		this.tags = tags;
 	}
 }

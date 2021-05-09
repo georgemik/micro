@@ -4,6 +4,7 @@ import io.micronaut.core.annotation.Introspected;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -14,14 +15,17 @@ import java.util.List;
 public class UserDto {
 	private Long id;
 	@NotBlank
+	@Size(max = 255)
 	private String name;
 	@NotBlank
 	@Email
+	@Size(max = 255)
 	private String email;
 	@NotBlank
+	@Size(max = 255)
 	private String group;
 	private Boolean active = true;
-	private List<String> tags;
+	private List<@Size(max = 255) String> tags;
 	private String href;
 
 	public UserDto() {

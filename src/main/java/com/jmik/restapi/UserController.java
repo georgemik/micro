@@ -11,11 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.jmik.restapi.utils.ThrowErrorFixture.badRequest;
 import static com.jmik.restapi.utils.ThrowErrorFixture.notFound;
 
 /**
@@ -42,10 +42,7 @@ public class UserController {
 
 	@Get("/users/{id}")
 	public UserDto getUserById(@PathVariable long id) {
-		Optional<User> user = userService.getById(id);
-		if (user.isEmpty()) {
-			throw notFound(String.format("User %d not found", id));
-		}
+		Optional<User> user = getUserAndValidateExists(id);
 		return mapEntityToDto(user.get());
 	}
 
@@ -57,20 +54,17 @@ public class UserController {
 
 	@Delete("/users/{id}")
 	public HttpStatus delete(@PathVariable long id) {
-		Optional<User> existingUser = userService.getById(id);
-		if (existingUser.isEmpty()) {
-			throw notFound(String.format("User %d not found", id));
-		}
+		getUserAndValidateExists(id);
 		userService.deleteById(id);
 		return HttpStatus.OK;
 	}
 
 	@Put("/users/{id}")
 	public HttpResponse<UserDto> updateUser(@Valid UserDto user, @PathVariable long id) {
-		Optional<User> existingUser = userService.getById(id);
-		if (existingUser.isEmpty()) {
-			throw notFound(String.format("User %d not found", id));
+		if (user.getId() == null) {
+			throw badRequest("Id must not be null");
 		}
+		getUserAndValidateExists(id);
 		User response = userService.updateUser(mapDtoToEntity(user));
 		return HttpResponse.ok(mapEntityToDto(response));
 	}
@@ -84,7 +78,7 @@ public class UserController {
 		usr.setEmail(request.getEmail());
 		usr.setGroup(request.getGroup());
 		usr.setActive(request.getActive());
-		usr.setTags(request.getTags().toString());
+		usr.setTags(request.getTags());
 		return usr;
 	}
 
@@ -95,9 +89,16 @@ public class UserController {
 		user.setEmail(entity.getEmail());
 		user.setGroup(entity.getGroup());
 		user.setActive(entity.getActive());
-//		needs improvement
-		user.setTags(Collections.singletonList(entity.getTags()));
+		user.setTags(entity.getTags());
 		user.setHref(apiUtils.getHref());
+		return user;
+	}
+
+	private Optional<User> getUserAndValidateExists(long id) {
+		Optional<User> user = userService.getById(id);
+		if (user.isEmpty()) {
+			throw notFound(String.format("User %d not found", id));
+		}
 		return user;
 	}
 

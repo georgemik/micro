@@ -1,5 +1,7 @@
-package com.jmik.restapi;
+package com.jmik.restapi.exceptionhandlers;
 
+import com.jmik.restapi.ApiException;
+import com.jmik.restapi.ErrorRecordDto;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
