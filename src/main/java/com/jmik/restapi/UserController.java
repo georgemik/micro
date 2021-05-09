@@ -25,6 +25,7 @@ import static com.jmik.restapi.utils.ThrowErrorFixture.notFound;
 @Controller("/api")
 public class UserController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+	private static final String API_HREF = "/api/users/%s";
 	@Inject
 	UserService userService;
 	@Inject
@@ -90,7 +91,7 @@ public class UserController {
 		user.setGroup(entity.getGroup());
 		user.setActive(entity.getActive());
 		user.setTags(entity.getTags());
-		user.setHref(apiUtils.getHref());
+		user.setHref(apiUtils.getHref(String.format(API_HREF, user.getId())));
 		return user;
 	}
 

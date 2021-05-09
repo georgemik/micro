@@ -16,11 +16,12 @@ import java.net.URL;
 @Singleton
 public class ApiUtils {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApiUtils.class);
-	public String getHref() {
+
+	public String getHref(String path) {
 		HttpRequest req = ServerRequestContext.currentRequest().get();
 		String href = "";
 		try {
-			href = new URL("http", req.getServerAddress().getHostName(), req.getServerAddress().getPort(), req.getPath()).toString();
+			href = new URL("http", req.getServerAddress().getHostName(), req.getServerAddress().getPort(), path).toString();
 		} catch (MalformedURLException ex) {
 			LOGGER.error("Can't create href", ex);
 		}

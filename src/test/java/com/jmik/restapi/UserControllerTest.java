@@ -83,7 +83,7 @@ class UserControllerTest {
 
 	@Test
 	public void updateUser_userExists_userUpdated() {
-		when(apiUtils.getHref()).thenReturn(HREF);
+		when(apiUtils.getHref(anyString())).thenReturn(HREF);
 		User testUser = getTestUserObj(ID);
 		UserDto testUserDto = getTestUserDto(ID);
 		when(userService.getById(ID)).thenReturn(getTestUser(ID));
@@ -99,7 +99,7 @@ class UserControllerTest {
 
 	@Test
 	public void getUsers_correctUsersReturned() {
-		when(apiUtils.getHref()).thenReturn(HREF);
+		when(apiUtils.getHref(anyString())).thenReturn(HREF);
 		UserDto expectedUser = getTestUserDto(ID);
 		when(userService.getAllUsers()).thenReturn(List.of(getTestUserObj(ID)));
 
@@ -112,7 +112,7 @@ class UserControllerTest {
 
 	@Test
 	public void getUserById_userExists_correctDtoMapped() {
-		when(apiUtils.getHref()).thenReturn(HREF);
+		when(apiUtils.getHref(anyString())).thenReturn(HREF);
 		UserDto expectedUser = getTestUserDto(ID);
 		when(userService.getById(ID)).thenReturn(getTestUser(ID));
 
@@ -122,7 +122,7 @@ class UserControllerTest {
 
 	@Test
 	public void create_userCreated() {
-		when(apiUtils.getHref()).thenReturn(HREF);
+		when(apiUtils.getHref(anyString())).thenReturn(HREF);
 		UserDto expectedUserDto = getTestUserDto(ID);
 		User expectedUser = getTestUserObj(ID);
 		ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
