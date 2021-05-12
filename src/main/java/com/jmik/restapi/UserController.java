@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.jmik.restapi.GroupMapper.mapDtoToGroup;
+import static com.jmik.restapi.GroupMapper.mapGroupToDto;
 import static com.jmik.restapi.utils.ThrowErrorFixture.badRequest;
 import static com.jmik.restapi.utils.ThrowErrorFixture.notFound;
 
@@ -49,7 +51,7 @@ public class UserController {
 
 	@Post("/users")
 	public HttpResponse<UserDto> create(@Valid UserDto user) {
-		User created = userService.save(mapDtoToEntity(user));
+		User created = userService.createUser(mapDtoToEntity(user));
 		return HttpResponse.created(mapEntityToDto(created));
 	}
 
@@ -77,7 +79,7 @@ public class UserController {
 		}
 		usr.setName(request.getName());
 		usr.setEmail(request.getEmail());
-		usr.setGroup(request.getGroup());
+		usr.setGroups(mapDtoToGroup(request.getGroups()));
 		usr.setActive(request.getActive());
 		usr.setTags(request.getTags());
 		return usr;
@@ -88,7 +90,7 @@ public class UserController {
 		user.setId(entity.getId());
 		user.setName(entity.getName());
 		user.setEmail(entity.getEmail());
-		user.setGroup(entity.getGroup());
+		user.setGroups(mapGroupToDto(entity.getGroups()));
 		user.setActive(entity.getActive());
 		user.setTags(entity.getTags());
 		user.setHref(apiUtils.getHref(String.format(API_HREF, user.getId())));

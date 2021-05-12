@@ -3,6 +3,7 @@ package com.jmik.restapi;
 import com.jmik.restapi.utils.ApiUtils;
 import com.jmik.service.UserService;
 import com.jmik.storage.User;
+import com.jmik.storage.UserGroup;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.jmik.restapi.ApiConstants.GROUP_ADMINS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,7 +32,7 @@ class UserControllerTest {
 	private static final long ID = 5L;
 	private static final String NAME = "test";
 	private static final String EMAIL = "test@test";
-	private static final String GROUP = "group";
+	private static final UserGroup GROUP = UserGroup.ADMINISTRATORS;
 	private static final String HREF = "http://test.href/api/users/x";
 	private static final String EXPECTED_MSG = "User 5 not found";
 	private static final List<String> TAGS = Arrays.asList("tag1", "tag2", "tag3");
@@ -126,7 +128,7 @@ class UserControllerTest {
 		UserDto expectedUserDto = getTestUserDto(ID);
 		User expectedUser = getTestUserObj(ID);
 		ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
-		when(userService.save(userArgumentCaptor.capture())).thenReturn(expectedUser);
+		when(userService.createUser(userArgumentCaptor.capture())).thenReturn(expectedUser);
 
 		HttpResponse<UserDto> response = userController.create(expectedUserDto);
 
@@ -151,7 +153,7 @@ class UserControllerTest {
 		testUser.setId(id);
 		testUser.setName(NAME);
 		testUser.setEmail(EMAIL);
-		testUser.setGroup(GROUP);
+		testUser.setGroups(List.of(GROUP));
 		testUser.setTags(TAGS);
 		return Optional.of(testUser);
 	}
@@ -161,7 +163,7 @@ class UserControllerTest {
 	}
 
 	private UserDto getTestUserDto(long id) {
-		UserDto testUser = new UserDto(NAME, EMAIL, GROUP);
+		UserDto testUser = new UserDto(NAME, EMAIL, List.of(GROUP_ADMINS));
 		testUser.setId(ID);
 		testUser.setTags(TAGS);
 		testUser.setHref(HREF);

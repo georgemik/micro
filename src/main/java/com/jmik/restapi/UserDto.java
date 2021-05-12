@@ -21,9 +21,8 @@ public class UserDto {
 	@Email
 	@Size(max = 255)
 	private String email;
-	@NotBlank
-	@Size(max = 255)
-	private String group;
+	@GroupsConstraint
+	private List<String> groups;
 	private Boolean active = true;
 	private List<@Size(max = 255) String> tags;
 	private String href;
@@ -31,10 +30,10 @@ public class UserDto {
 	public UserDto() {
 	}
 
-	public UserDto(String name, String email, String group) {
+	public UserDto(String name, String email, List<String> groups) {
 		this.name = name;
 		this.email = email;
-		this.group = group;
+		this.groups = groups;
 	}
 
 	public void setName(String name) {
@@ -43,10 +42,6 @@ public class UserDto {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public void setGroup(String group) {
-		this.group = group;
 	}
 
 	public Long getId() {
@@ -65,8 +60,12 @@ public class UserDto {
 		return email;
 	}
 
-	public String getGroup() {
-		return group;
+	public List<String> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(List<String> groups) {
+		this.groups = groups;
 	}
 
 	public Boolean getActive() {

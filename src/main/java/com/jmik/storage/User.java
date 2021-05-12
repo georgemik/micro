@@ -8,9 +8,13 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
+ * User entity used to store user.
  * @author jmik
  */
 @Entity
@@ -27,18 +31,24 @@ public class User {
 	@Column(name = "EMAIL")
 	@Size(max = 255)
 	private String email;
-	@Column(name = "USER_GROUP")
-	@Size(max = 255)
-	private String group;
+	@ElementCollection
+	@CollectionTable(name = "GROUPS", joinColumns = @JoinColumn(name = "USER_ID"))
+	@Column(name = "GRUPE")
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "USER_ID")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@Convert(converter = GroupConverter.class)
+	@Size(min = 1)
+	Set<UserGroup> groups;
 	@Column(name = "ACTIVE")
 	private Boolean active = true;
-	@ElementCollection()
+	@ElementCollection
 	@CollectionTable(name = "TAGS", joinColumns = @JoinColumn(name = "USER_ID"))
 	@Column(name = "TAG")
 	@Fetch(FetchMode.JOIN)
 	@JoinColumn(name = "USER_ID")
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	private List<String> tags;
+	private Set<String> tags;
 
 	public Long getId() {
 		return id;
@@ -64,12 +74,12 @@ public class User {
 		this.email = email;
 	}
 
-	public String getGroup() {
-		return group;
+	public List<UserGroup> getGroups() {
+		return new ArrayList<>(groups);
 	}
 
-	public void setGroup(String group) {
-		this.group = group;
+	public void setGroups(List<UserGroup> groups) {
+		this.groups = new HashSet<>(groups);
 	}
 
 	public Boolean getActive() {
@@ -81,10 +91,10 @@ public class User {
 	}
 
 	public List<String> getTags() {
-		return tags;
+		return new ArrayList<>(tags);
 	}
 
 	public void setTags(List<String> tags) {
-		this.tags = tags;
+		this.tags = new HashSet<>(tags);
 	}
 }

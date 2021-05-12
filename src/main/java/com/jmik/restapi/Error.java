@@ -4,32 +4,32 @@ package com.jmik.restapi;
  * Record of single error.
  * @author jmik
  */
-public class Error {
+class Error {
 	private String reason;
 	private String message;
 	private String location;
 
-	public String getReason() {
+	String getReason() {
 		return reason;
 	}
 
-	public void setReason(String reason) {
+	void setReason(String reason) {
 		this.reason = reason;
 	}
 
-	public String getMessage() {
+	String getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
+	void setMessage(String message) {
 		this.message = message;
 	}
 
-	public String getLocation() {
+	String getLocation() {
 		return location;
 	}
 
-	public void setLocation(String location) {
+	void setLocation(String location) {
 		this.location = location;
 	}
 }

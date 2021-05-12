@@ -17,23 +17,46 @@ public class UserService {
 	@Inject
 	UserRepositry userRepositry;
 
-	public User save(User user) {
-		return userRepositry.save(user);
-	}
-
+	/**
+	 * Get user by id.
+	 * @param id
+	 * @return
+	 */
 	public Optional<User> getById(Long id) {
 		return userRepositry.findById(id);
 	}
 
-	public void deleteById(Long id) {
-		userRepositry.deleteById(id);
-	}
-
+	/**
+	 * Get all users.
+	 * @return
+	 */
 	public List<User> getAllUsers() {
 		return userRepositry.listAll();
 	}
 
+	/**
+	 * Create the user.
+	 * @param user
+	 * @return
+	 */
+	public User createUser(User user) {
+		return userRepositry.save(user);
+	}
+
+	/**
+	 * Update the user.
+	 * @param user
+	 * @return
+	 */
 	public User updateUser(User user) {
 		return userRepositry.update(user);
+	}
+
+	/**
+	 * Delete user with id.
+	 * @param id
+	 */
+	public void deleteById(Long id) {
+		userRepositry.deleteById(id);
 	}
 }
