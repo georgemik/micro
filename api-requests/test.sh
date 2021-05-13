@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-HOST="$1"
+if [[ -z "$1" ]]; then
+  HOST="localhost"
+else
+  HOST="$1"
+fi
 
 curl -v -X "POST" "http://localhost:8080/api/users" \
  -H "Content-Type: application/json; charset=utf-8" \
